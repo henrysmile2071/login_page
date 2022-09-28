@@ -38,6 +38,10 @@ app.get('/', (req, res) => {
   res.render('index')
 })
 
+app.post('/verification', (req,res) => {
+  const email = req.body.email
+  const password = req.body.password
+})
 app.listen(port, () => {
   console.log(`App is running on http://localhost:${port}`)
 })
