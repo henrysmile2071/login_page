@@ -38,14 +38,40 @@ app.get('/', (req, res) => {
   res.render('index')
 })
 
-app.post('/verification', (req,res) => {
+app.post('/verification', (req, res) => {
+  const accountData = req.body
   const email = req.body.email
-  const password = req.body.password
+  const token = { email }
+  let msg = ''
+  const verifyToken = verifyAccount(accountData)
+  switch (verifyToken) {
+    case 'noEmailInDB':
+      token.msg = 'Email does not exist in database'
+      res.render('index', { token })
+      break;
+    case 'incorrectPassword':
+      token.msg = 'Password is incorrect'
+      res.render('index', { token })
+      break;
+    default:
+      token.firstName = verifyToken.firstName
+      res.render('success', { token })
+  }
 })
+
 app.listen(port, () => {
   console.log(`App is running on http://localhost:${port}`)
 })
 
-function verifyAccount(email, password) {
-
+function verifyAccount(accountData) {
+  let verifyToken = ''
+  const userIndex = users.findIndex(account => account.email === accountData.email)
+  if (userIndex === -1) {
+    verifyToken = 'noEmailInDB' //no user in database
+  } else if (accountData.password === users[userIndex].password) {
+    verifyToken = users[userIndex] //pass
+  } else {
+    verifyToken = 'incorrectPassword' //incorrect password
+  }
+  return verifyToken
 }
